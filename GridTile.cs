@@ -3,6 +3,9 @@ using System.Collections;
 
 public class GridTile : MonoBehaviour
 {
+    bool isPassable = false;
+    TileType tileType = TileType.Building;
+
     public enum TileType
     {
         Grass = 1,
@@ -10,50 +13,54 @@ public class GridTile : MonoBehaviour
         Rock = 3,
         Water = 4,
         Building = 5,
-    };
-
-    public TileType tileType;
+    };   
 
     public Color defaultColor = Color.white;
 
-    public TileType getTileType()
+    public TileType getTileType ()
     {
         return tileType;
     }
 
-    public void setTileType(TileType type)
+    public void setTileType (TileType type)
     {
-        switch (type)
-        {
-            case TileType.Grass:
-                defaultColor = new Color(0.0f, 0.7f, 0.0f); break;
-            case TileType.Sand:
-                defaultColor = new Color(0.7f, 0.7f, 0.0f); break;
-            case TileType.Rock:
-                defaultColor = new Color(0.7f, 0.7f, 0.7f); break;
-            case TileType.Water:
-                defaultColor = new Color(0.0f, 0.0f, 0.7f); break;
-            default:
-                break;
+        isPassable = false;
+
+        switch (type) {
+        case TileType.Grass:
+            defaultColor = new Color (0.0f, 0.7f, 0.0f, 1.0f);
+            isPassable = true;
+            break;
+        case TileType.Sand:
+            defaultColor = new Color (0.7f, 0.7f, 0.0f, 1.0f);
+            isPassable = false;
+            break;
+        case TileType.Rock:
+            defaultColor = new Color (0.7f, 0.7f, 0.7f, 1.0f);
+            break;
+        case TileType.Water:
+            defaultColor = new Color (0.0f, 0.0f, 0.7f, 1.0f);
+            break;
+        default:
+            break;
 
         }
 
-        SpriteRenderer sprite = GetComponent<SpriteRenderer>();
-        if (sprite)
-        {
+        SpriteRenderer sprite = GetComponent<SpriteRenderer> ();
+        if (sprite) {
             sprite.color = defaultColor;
         }
         tileType = type;
     }
 
     // Use this for initialization
-    void Start()
+    void Start ()
     {
         //setTileType(TileType.Building);
     }
 
     // Update is called once per frame
-    void Update()
+    void Update ()
     {
 
     }
