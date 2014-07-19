@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GridTile : MonoBehaviour
 {
-    bool isPassable = false;
+    public bool isPassable { get; internal set; }
     TileType tileType = TileType.Building;
+
+    public List<GridTile> neighbors; 
 
     public enum TileType
     {
@@ -33,7 +36,7 @@ public class GridTile : MonoBehaviour
             break;
         case TileType.Sand:
             defaultColor = new Color (0.7f, 0.7f, 0.0f, 1.0f);
-            isPassable = false;
+            isPassable = true;
             break;
         case TileType.Rock:
             defaultColor = new Color (0.7f, 0.7f, 0.7f, 1.0f);
@@ -51,6 +54,15 @@ public class GridTile : MonoBehaviour
             sprite.color = defaultColor;
         }
         tileType = type;
+    }
+
+    public void addNeighbor (GridTile _Node)
+    {
+        if (!isPassable || !_Node.isPassable)
+            return;
+
+        neighbors.Add (_Node);
+        _Node.neighbors.Add (this);
     }
 
     // Use this for initialization

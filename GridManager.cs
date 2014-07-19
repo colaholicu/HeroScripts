@@ -1,21 +1,55 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour
 {
     public GameObject HexTile;
     public int HorizontalTiles = 50;
     public int VerticalTiles = 50;
-    public bool UsePathfinding = false;
+    public bool UsePathfinding = false;   
+    public bool UseNeighborHighlight = false;     
 
-    float fHexWidth;
-    float fHexHeight;
+    float fHexWidth = 0.0f;
+    float fHexHeight = 0.0f;
 
     GameObject crtTile = null;
     GameObject Tile1 = null, Tile2 = null;
 
+    GridGraph gridGraph;
+
     void DoPathfinding ()
     {
+    }
+
+    void markNeighbors (GameObject Tile, bool Mark)
+    {
+        markTile (Tile, Mark);
+        GridTile Node = Tile.GetComponent<GridTile> ();
+        if (!Node)
+            return;
+
+        for (int i = 0; i < Node.neighbors.Count; i++) {
+            markTile (Node.neighbors [i].gameObject, Mark);
+        }
+    }
+
+    void markForPathFinding (GameObject Tile)
+    {
+        if (!Tile1 && !Tile2) { // none selected
+            Tile1 = Tile;
+            markTile (Tile1, true);
+        } else if (!Tile2) { // first selected
+            Tile2 = Tile;
+            markTile (Tile2, true);
+            DoPathfinding ();
+        } else { // both selected => new selection
+            markTile (Tile2, false);
+            markTile (Tile1, false);
+            Tile2 = null;
+            Tile1 = Tile;
+            markTile (Tile1, true);
+        }
     }
 
     void checkForClickedTiles ()
@@ -26,24 +60,16 @@ public class GridManager : MonoBehaviour
             if (Physics.Raycast (ray, out hit)) {
                 GameObject hitObject = hit.collider.gameObject;
                 if (hitObject.GetComponent<SpriteRenderer> ()) {
-                    if (!UsePathfinding) {
+                    if (!UsePathfinding && !UseNeighborHighlight) {
                         highlightTile (hitObject);
-                        return;
-                    }
+                    } else if (UseNeighborHighlight) {
+                        if (Tile1)
+                            markNeighbors (Tile1, false);
 
-                    if (!Tile1 && !Tile2) { // none selected
                         Tile1 = hitObject;
-                        markTile (Tile1, true);
-                    } else if (!Tile2) { // first selected
-                        Tile2 = hitObject;
-                        markTile (Tile2, true);
-                        DoPathfinding ();
-                    } else { // both selected => new selection
-                        markTile (Tile2, false);
-                        markTile (Tile1, false);
-                        Tile2 = null;
-                        Tile1 = hitObject;
-                        markTile (Tile1, true);
+                        markNeighbors (Tile1, true);
+                    } else {
+                        markForPathFinding (hitObject);
                     }
                 }
             }
@@ -58,8 +84,7 @@ public class GridManager : MonoBehaviour
 
         sprite.color = new Color (sprite.color.r, sprite.color.g, sprite.color.b, mark ? 0.5f : 1.0f);
     }
-
-
+  
     public void highlightTile (GameObject Tile)
     {
         if (Tile == crtTile)
@@ -103,8 +128,8 @@ public class GridManager : MonoBehaviour
     float getNextPositionX (float f, ref bool bUseOffset)
     {
         if (General.isZeroF (f)) {
-            // shift left 1 tile
-            float newX = General.minCoords.x - (bUseOffset ? 0 : fHexWidth / 2);
+            // shift right 1 tile
+            float newX = General.minCoords.x + (bUseOffset ? 0 : fHexWidth / 2);
             bUseOffset = false;
             return newX;
         }
@@ -135,6 +160,7 @@ public class GridManager : MonoBehaviour
 
     void createGrid ()
     {
+        gridGraph = new GridGraph (VerticalTiles, HorizontalTiles);
         Vector2 vPos = new Vector2 (0, 0);
         bool bUseOffset = false;
         int tagCnt = 1;
@@ -151,16 +177,18 @@ public class GridManager : MonoBehaviour
                 if (!gridTile)
                     continue;
 
-
                 GridTile.TileType type = getTileTypeByRandPercentage (Random.Range (1, 100));
                 gridTile.setTileType (type);
-
 
                 // Current position in grid
                 vPos.x = getNextPositionX (vPos.x, ref bUseOffset);
                 hex.transform.position = new Vector3 (vPos.x, vPos.y, 0);
+
+                gridGraph.nodes.Add (gridTile.gameObject);
             }
         }
+
+        gridGraph.Connect ();
     }
 
     // Use this for initialization
