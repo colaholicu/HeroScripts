@@ -4,10 +4,13 @@ using System.Collections.Generic;
 
 public class GridTile : MonoBehaviour
 {
-    public bool isPassable { get; internal set; }
+    public bool Passable { get; internal set; }
+    public int Row, Col;
+    public int f = 0, g = 0, h = 0;
+    public GridTile Parent;
     TileType tileType = TileType.Building;
 
-    public List<GridTile> neighbors; 
+    public List<GridTile> Neighbors;
 
     public enum TileType
     {
@@ -16,9 +19,32 @@ public class GridTile : MonoBehaviour
         Rock = 3,
         Water = 4,
         Building = 5,
-    };   
+    };
 
     public Color defaultColor = Color.white;
+
+    public void calcF (GridTile _Node)
+    {           
+        int X = Row - _Node.Row;
+        int Y = Col - _Node.Col;
+        int Z = (0 - (Row + Col)) - (0 - (_Node.Row + _Node.Col));
+        h = (int)(System.Math.Sqrt (X * X) + System.Math.Sqrt (Y * Y) + System.Math.Sqrt (Z * Z)) / 2;
+        f = g + h;
+    }
+
+    public int distance (GridTile _Node)
+    {
+        int X = Row - _Node.Row;
+        int Y = Col - _Node.Col;
+        int Z = (0 - (Row + Col)) - (0 - (_Node.Row + _Node.Col));
+        return (int)(System.Math.Sqrt (X * X) + System.Math.Sqrt (Y * Y) + System.Math.Sqrt (Z * Z)) / 2;
+    }
+    
+    public void setCoords (int _Row, int _Col)
+    {
+        Row = _Row;
+        Col = _Col;
+    }
 
     public TileType getTileType ()
     {
@@ -27,16 +53,16 @@ public class GridTile : MonoBehaviour
 
     public void setTileType (TileType type)
     {
-        isPassable = false;
+        Passable = false;
 
         switch (type) {
         case TileType.Grass:
             defaultColor = new Color (0.0f, 0.7f, 0.0f, 1.0f);
-            isPassable = true;
+            Passable = true;
             break;
         case TileType.Sand:
             defaultColor = new Color (0.7f, 0.7f, 0.0f, 1.0f);
-            isPassable = true;
+            Passable = true;
             break;
         case TileType.Rock:
             defaultColor = new Color (0.7f, 0.7f, 0.7f, 1.0f);
@@ -58,17 +84,17 @@ public class GridTile : MonoBehaviour
 
     public void addNeighbor (GridTile _Node)
     {
-        if (!isPassable || !_Node.isPassable)
+        if (!Passable || !_Node.Passable)
             return;
 
-        neighbors.Add (_Node);
-        _Node.neighbors.Add (this);
+        Neighbors.Add (_Node);
+        _Node.Neighbors.Add (this);
     }
 
     // Use this for initialization
     void Start ()
     {
-        //setTileType(TileType.Building);
+
     }
 
     // Update is called once per frame

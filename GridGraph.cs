@@ -2,21 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GridGraph : MonoBehaviour
+public class GridGraph
 {
     int Rows, Columns;
     public List<GameObject> nodes;
-    
-    public GridGraph (int _Rows, int _Columns)
-    {
-        Rows = _Rows;
-        Columns = _Columns;
-        nodes = new List<GameObject> ();
-        nodes.Clear ();
-        Debug.Log ("GridGraph constructor");
-    }      
-    
-    int getValidIndex (int i, int j)
+        
+    public int getValidIndex (int i, int j)
     {
         if (i < 0 || j < 0)
             return -1;
@@ -28,8 +19,16 @@ public class GridGraph : MonoBehaviour
         // rows exceeded
         if (i > (Rows - 1))
             return -1;
-        
+
         return ((i * Columns) + j);
+    }
+
+    public GridGraph (int _Rows, int _Columns)
+    {
+        Rows = _Rows;
+        Columns = _Columns;
+        nodes = new List<GameObject> ();
+        nodes.Clear ();
     }
     
     public void Connect ()
@@ -72,17 +71,5 @@ public class GridGraph : MonoBehaviour
                 }
             }
         }
-    }
-
-    // Use this for initialization
-    void Start ()
-    {
-	
-    }
-	
-    // Update is called once per frame
-    void Update ()
-    {
-	
     }
 }
