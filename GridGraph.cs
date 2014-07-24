@@ -2,12 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GridGraph
+public class HeroGridGraph
 {
     int Rows, Columns;
-    public List<GameObject> nodes;
+    public List<GameObject> Nodes;
         
-    public int getValidIndex (int i, int j)
+    public int GetValidIndex (int i, int j)
     {
         if (i < 0 || j < 0)
             return -1;
@@ -23,50 +23,50 @@ public class GridGraph
         return ((i * Columns) + j);
     }
 
-    public GridGraph (int _Rows, int _Columns)
+    public HeroGridGraph (int _Rows, int _Columns)
     {
         Rows = _Rows;
         Columns = _Columns;
-        nodes = new List<GameObject> ();
-        nodes.Clear ();
+        Nodes = new List<GameObject> ();
+        Nodes.Clear ();
     }
     
     public void Connect ()
     {
         for (int i = 0; i < Rows; i++) {
-            bool even = (i % 2 == 0);
+            bool IsEven = (i % 2 == 0);
             for (int j = 0; j < Columns; j++) {
                 for (int c = 0; c < 6; c++) {
-                    int neighIndex = -1, nodeIndex = -1;
+                    int NeighIndex = -1, NodeIndex = -1;
                     switch (c) {
                     case 0:
-                        neighIndex = getValidIndex (i, j - 1);
+                        NeighIndex = GetValidIndex (i, j - 1);
                         break;
                     case 1:
-                        neighIndex = getValidIndex (i, j + 1);
+                        NeighIndex = GetValidIndex (i, j + 1);
                         break;
                     case 2:
-                        neighIndex = getValidIndex (i - 1, j);
+                        NeighIndex = GetValidIndex (i - 1, j);
                         break;
                     case 3:
-                        neighIndex = getValidIndex (i + 1, j);
+                        NeighIndex = GetValidIndex (i + 1, j);
                         break;
                     case 4:
                         // i+1, j-1/j+1
-                        neighIndex = getValidIndex (i - 1, even ? j + 1 : j - 1);
+                        NeighIndex = GetValidIndex (i - 1, IsEven ? j + 1 : j - 1);
                         break;
                     case 5:
                         // i-1, j-1/j+1
-                        neighIndex = getValidIndex (i + 1, even ? j + 1 : j - 1);
+                        NeighIndex = GetValidIndex (i + 1, IsEven ? j + 1 : j - 1);
                         break;
                     }
                     
-                    nodeIndex = getValidIndex (i, j);
-                    if (neighIndex >= 0 && nodeIndex >= 0) {
-                        GridTile node = nodes [nodeIndex].GetComponent<GridTile> ();
-                        GridTile neigh = nodes [neighIndex].GetComponent<GridTile> ();
-                        if (node && neigh)
-                            node.addNeighbor (neigh);
+                    NodeIndex = GetValidIndex (i, j);
+                    if (NeighIndex >= 0 && NodeIndex >= 0) {
+                        HeroGridTile Node = Nodes [NodeIndex].GetComponent<HeroGridTile> ();
+                        HeroGridTile Neighbor = Nodes [NeighIndex].GetComponent<HeroGridTile> ();
+                        if (Node && Neighbor)
+                            Node.AddNeighbor (Neighbor);
                     }
                 }
             }

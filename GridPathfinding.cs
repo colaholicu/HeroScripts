@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-public class GridPathfinder
+public class HeroGridPathfinder
 {
-    public List<GridTile> Path;
+    public List<HeroGridTile> Path;
 
-    public GridGraph GraphNodes;
+    public HeroGridGraph GraphNodes;
 
-    public static int NodeCompare (GridTile Node1, GridTile Node2)
+    public static int NodeCompare (HeroGridTile Node1, HeroGridTile Node2)
     {
         if (Node1.f > Node2.f)
             return 1;
@@ -19,20 +19,20 @@ public class GridPathfinder
         return 0;
     }
 
-    List<GridTile> OpenList, ClosedList;
-    GridTile Start, Finish;
+    List<HeroGridTile> OpenList, ClosedList;
+    HeroGridTile Start, Finish;
 
-    public GridPathfinder ()
+    public HeroGridPathfinder ()
     {
-        Path = new List<GridTile> ();
+        Path = new List<HeroGridTile> ();
         Path.Clear ();
-        OpenList = new List<GridTile> ();
+        OpenList = new List<HeroGridTile> ();
         OpenList.Clear ();
-        ClosedList = new List<GridTile> ();
+        ClosedList = new List<HeroGridTile> ();
         ClosedList.Clear ();
     }
 
-    public void Initialize (GridTile _Start, GridTile _Finish)
+    public void Initialize (HeroGridTile _Start, HeroGridTile _Finish)
     {
         Path.Clear ();
         OpenList.Clear ();
@@ -41,21 +41,21 @@ public class GridPathfinder
         Finish = _Finish;
 
         Start.Parent = null;
-        Start.calcF (Finish);
+        Start.CalcF (Finish);
         OpenList.Add (Start);
     }
 
-    void ProcessNeighbors (GridTile Node)
+    void ProcessNeighbors (HeroGridTile Node)
     {
-        foreach (GridTile Neighbor in Node.Neighbors) {
+        foreach (HeroGridTile Neighbor in Node.Neighbors) {
             if (ClosedList.Contains (Neighbor) || !Neighbor.Passable)
                 continue;
             
-            int tempG = Node.g + Node.distance (Neighbor);
+            int tempG = Node.g + Node.Distance (Neighbor);
             if (!OpenList.Contains (Neighbor) || tempG < Neighbor.g) {
                 Neighbor.Parent = Node;
                 Neighbor.g = tempG;
-                Neighbor.calcF (Finish);
+                Neighbor.CalcF (Finish);
                 
                 if (!OpenList.Contains (Neighbor))
                     OpenList.Add (Neighbor);
@@ -67,10 +67,10 @@ public class GridPathfinder
     {
         while (OpenList.Count > 0) {
             OpenList.Sort (NodeCompare);
-            GridTile CurrentNode = OpenList [0];
+            HeroGridTile CurrentNode = OpenList [0];
             OpenList.RemoveAt (0);
             if (CurrentNode == Finish) {
-                GridTile PathNode = Finish;
+                HeroGridTile PathNode = Finish;
                 while (PathNode != null) {
                     Path.Add (PathNode);
                     PathNode = PathNode.Parent;

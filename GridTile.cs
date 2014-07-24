@@ -2,15 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GridTile : MonoBehaviour
+public class HeroGridTile : MonoBehaviour
 {
     public bool Passable { get; internal set; }
     public int Row, Col;
     public int f = 0, g = 0, h = 0;
-    public GridTile Parent;
-    TileType tileType = TileType.Building;
+    public HeroGridTile Parent;
+    TileType Type = TileType.Building;
 
-    public List<GridTile> Neighbors;
+    public List<HeroGridTile> Neighbors;
 
     public enum TileType
     {
@@ -21,9 +21,9 @@ public class GridTile : MonoBehaviour
         Building = 5,
     };
 
-    public Color defaultColor = Color.white;
+    public Color DefaultColor = Color.white;
 
-    public void calcF (GridTile _Node)
+    public void CalcF (HeroGridTile _Node)
     {           
         int X = Row - _Node.Row;
         int Y = Col - _Node.Col;
@@ -32,57 +32,51 @@ public class GridTile : MonoBehaviour
         f = g + h;
     }
 
-    public int distance (GridTile _Node)
+    public int Distance (HeroGridTile _Node)
     {
         int X = Row - _Node.Row;
         int Y = Col - _Node.Col;
         int Z = (0 - (Row + Col)) - (0 - (_Node.Row + _Node.Col));
         return (int)(System.Math.Sqrt (X * X) + System.Math.Sqrt (Y * Y) + System.Math.Sqrt (Z * Z)) / 2;
     }
-    
-    public void setCoords (int _Row, int _Col)
+
+    public TileType GetTileType ()
     {
-        Row = _Row;
-        Col = _Col;
+        return Type;
     }
 
-    public TileType getTileType ()
-    {
-        return tileType;
-    }
-
-    public void setTileType (TileType type)
+    public void SetTileType (TileType _Type)
     {
         Passable = false;
 
-        switch (type) {
+        switch (_Type) {
         case TileType.Grass:
-            defaultColor = new Color (0.0f, 0.7f, 0.0f, 1.0f);
+            DefaultColor = new Color (0.0f, 0.7f, 0.0f, 1.0f);
             Passable = true;
             break;
         case TileType.Sand:
-            defaultColor = new Color (0.7f, 0.7f, 0.0f, 1.0f);
+            DefaultColor = new Color (0.7f, 0.7f, 0.0f, 1.0f);
             Passable = true;
             break;
         case TileType.Rock:
-            defaultColor = new Color (0.7f, 0.7f, 0.7f, 1.0f);
+            DefaultColor = new Color (0.7f, 0.7f, 0.7f, 1.0f);
             break;
         case TileType.Water:
-            defaultColor = new Color (0.0f, 0.0f, 0.7f, 1.0f);
+            DefaultColor = new Color (0.0f, 0.0f, 0.7f, 1.0f);
             break;
         default:
             break;
 
         }
 
-        SpriteRenderer sprite = GetComponent<SpriteRenderer> ();
-        if (sprite) {
-            sprite.color = defaultColor;
+        SpriteRenderer SpriteComponent = GetComponent<SpriteRenderer> ();
+        if (SpriteComponent) {
+            SpriteComponent.color = DefaultColor;
         }
-        tileType = type;
+        Type = _Type;
     }
 
-    public void addNeighbor (GridTile _Node)
+    public void AddNeighbor (HeroGridTile _Node)
     {
         if (!Passable || !_Node.Passable)
             return;

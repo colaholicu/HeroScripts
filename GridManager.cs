@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GridManager : MonoBehaviour
+public class HeroGridManager : MonoBehaviour
 {
     public GameObject HexTile;
     public int Columns = 50;
@@ -16,14 +16,14 @@ public class GridManager : MonoBehaviour
     GameObject CrtTile = null;
     GameObject Tile1 = null, Tile2 = null;
 
-    GridGraph GraphNodes;
-    GridPathfinder Pathfinder;
+    HeroGridGraph GraphNodes;
+    HeroGridPathfinder Pathfinder;
 
     void DoPathfinding ()
     {
         markPath (false);
-        GridTile Start = Tile1.GetComponent<GridTile> ();
-        GridTile Finish = Tile2.GetComponent<GridTile> ();
+        HeroGridTile Start = Tile1.GetComponent<HeroGridTile> ();
+        HeroGridTile Finish = Tile2.GetComponent<HeroGridTile> ();
         if (Start == null || Finish == null)
             return;
 
@@ -32,23 +32,23 @@ public class GridManager : MonoBehaviour
         markPath (true);
     }
 
-    public int getValidIndex (int i, int j)
+    public int GetValidIndex (int i, int j)
     {
-        int index = GraphNodes.getValidIndex (i, j);
-        if (index == -1)
+        int Index = GraphNodes.GetValidIndex (i, j);
+        if (Index == -1)
             return -1;
 
-        if (GraphNodes.nodes [index].GetComponent<GridTile> ().Passable == false)
+        if (GraphNodes.Nodes [Index].GetComponent<HeroGridTile> ().Passable == false)
             return -1;
 
-        return index;
+        return Index;
     }
 
 
     void markNeighbors (GameObject Tile, bool Mark)
     {
         markTile (Tile, Mark);
-        GridTile Node = Tile.GetComponent<GridTile> ();
+        HeroGridTile Node = Tile.GetComponent<HeroGridTile> ();
         if (!Node)
             return;
 
@@ -62,10 +62,10 @@ public class GridManager : MonoBehaviour
         if (Pathfinder == null || Pathfinder.Path == null)
             return;
 
-        foreach (GridTile Node in Pathfinder.Path) {
-            int index = GraphNodes.getValidIndex (Node.Row, Node.Col);
-            if (index != -1)
-                markTile (GraphNodes.nodes [index], Mark);
+        foreach (HeroGridTile Node in Pathfinder.Path) {
+            int Index = GraphNodes.GetValidIndex (Node.Row, Node.Col);
+            if (Index != -1)
+                markTile (GraphNodes.Nodes [Index], Mark);
         }
     }
 
@@ -130,7 +130,7 @@ public class GridManager : MonoBehaviour
         if (!sprite)
             return;
 
-        GridTile gridTile = Tile.GetComponent<GridTile> ();
+        HeroGridTile gridTile = Tile.GetComponent<HeroGridTile> ();
         if (!gridTile)
             return;
 
@@ -161,9 +161,9 @@ public class GridManager : MonoBehaviour
         General.minCoords.y = -1 * Camera.main.orthographicSize;
     }
 
-    float getNextPositionX (float f, ref bool bUseOffset)
+    float GetNextPositionX (float f, ref bool bUseOffset)
     {
-        if (General.isZeroF (f)) {
+        if (General.IsZeroF (f)) {
             // shift right 1 tile
             float newX = General.minCoords.x + (bUseOffset ? 0 : HexWidth / 2);
             bUseOffset = false;
@@ -173,35 +173,35 @@ public class GridManager : MonoBehaviour
         return (f + HexWidth);
     }
 
-    float getNextPositionY (float f)
+    float GetNextPositionY (float f)
     {
-        if (General.isZeroF (f))
+        if (General.IsZeroF (f))
             return General.minCoords.y;
 
         // return the proper new placement (3/4 tile height)
         return (f + 3 * HexHeight / 4);
     }
 
-    GridTile.TileType getTileTypeByRandPercentage (int value)
+    HeroGridTile.TileType GetTileTypeByRandPercentage (int Value)
     {
-        if (value > 90)
-            return GridTile.TileType.Rock;
-        else if (value > 80)
-            return GridTile.TileType.Water;
-        else if (value > 40)
-            return GridTile.TileType.Sand;
+        if (Value > 90)
+            return HeroGridTile.TileType.Rock;
+        else if (Value > 80)
+            return HeroGridTile.TileType.Water;
+        else if (Value > 40)
+            return HeroGridTile.TileType.Sand;
         else
-            return GridTile.TileType.Grass;
+            return HeroGridTile.TileType.Grass;
     }
 
     void createGrid ()
     {
-        GraphNodes = new GridGraph (Rows, Columns);
+        GraphNodes = new HeroGridGraph (Rows, Columns);
         Vector2 vPos = new Vector2 (0, 0);
         bool bUseOffset = false;
         int tagCnt = 1;
         for (int y = 0; y < Rows; y++) {
-            vPos.y = getNextPositionY (vPos.y);
+            vPos.y = GetNextPositionY (vPos.y);
             vPos.x = 0;
             bUseOffset = (y % 2 != 0) ? true : false;
             for (int x = 0; x < Columns; x++) {
@@ -209,19 +209,20 @@ public class GridManager : MonoBehaviour
                 GameObject Hex = (GameObject)Instantiate (HexTile);
                 Hex.name = "Tile" + tagCnt++;
 
-                GridTile Tile = Hex.GetComponent<GridTile> ();
+                HeroGridTile Tile = Hex.GetComponent<HeroGridTile> ();
                 if (!Tile)
                     continue;
 
-                GridTile.TileType type = getTileTypeByRandPercentage (Random.Range (1, 100));
-                Tile.setTileType (type);
-                Tile.setCoords (y, x);
+                HeroGridTile.TileType type = GetTileTypeByRandPercentage (Random.Range (1, 100));
+                Tile.SetTileType (type);
+                Tile.Row = y;
+                Tile.Col = x;
 
                 // Current position in grid
-                vPos.x = getNextPositionX (vPos.x, ref bUseOffset);
+                vPos.x = GetNextPositionX (vPos.x, ref bUseOffset);
                 Hex.transform.position = new Vector3 (vPos.x, vPos.y, 0);
 
-                GraphNodes.nodes.Add (Tile.gameObject);
+                GraphNodes.Nodes.Add (Tile.gameObject);
             }
         }
 
@@ -233,7 +234,7 @@ public class GridManager : MonoBehaviour
     {
         setSizes ();
         createGrid ();
-        Pathfinder = new GridPathfinder ();
+        Pathfinder = new HeroGridPathfinder ();
         Pathfinder.GraphNodes = GraphNodes;
     }
 
