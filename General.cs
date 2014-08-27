@@ -11,6 +11,31 @@ public class General : MonoBehaviour
         return (Mathf.Abs (f) <= Mathf.Epsilon);
     }
 
+    static public bool IsEqualF (float a, float b)
+    {
+        return IsZeroF (a - b);
+    }
+
+    static public bool IsGreaterF (float a, float b)
+    {
+        return ((a * a - b * b) > (Mathf.Epsilon * Mathf.Epsilon));
+    }
+
+    static public bool IsLessF (float a, float b)
+    {
+        return ((a * a - b * b) < (Mathf.Epsilon * Mathf.Epsilon));
+    }
+
+    static public bool IsGreatEqF (float a, float b)
+    {
+        return ((a * a - b * b) > (Mathf.Epsilon * Mathf.Epsilon) || IsEqualF (a, b));
+    }
+
+    static public bool IsLessEqF (float a, float b)
+    {
+        return ((a * a - b * b) < (Mathf.Epsilon * Mathf.Epsilon) || IsEqualF (a, b));
+    }
+
     // Use this for initialization
     void Start ()
     {
